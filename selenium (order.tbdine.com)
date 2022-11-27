@@ -1,0 +1,236 @@
+import time
+from selenium import webdriver                                                       #importing python libraries and web drivers..
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
+import pandas as pd
+
+
+s = Service('C:/chromedriver.exe')
+chrome_options = webdriver.ChromeOptions()
+
+prefs = {"profile.default_content_setting_values.notifications": 2}                  # -->>>>? handle alert
+chrome_options.add_experimental_option("prefs", prefs)
+
+driver = webdriver.Chrome(chrome_options=chrome_options,  service=s)
+driver.implicitly_wait(5)
+driver.maximize_window()
+
+url = 'https://order.tbdine.com'                                                      #main url/link of website
+
+driver.get(url)
+time.sleep(3)
+
+# Cities = str(input("Enter the Address : "))                                          #enter of any city
+cities = driver.find_element(By.CLASS_NAME, 'css-1kgs9c3')
+cities.send_keys('Vancouver')
+
+search_result= driver.find_element(By.CLASS_NAME,'css-1afnk32')                       #resulting resturants according to search
+search_result.click()
+time.sleep(2)
+
+choose = str(input("Dilivery/Pickup : "))
+if choose == "PickUp" or choose == "pickup" or choose == "Pickup":                   #do you want to deliver or pickup
+
+    pickup = driver.find_element(By.CSS_SELECTOR, 'button[data-test="submit-pickup"]')
+    pickup.click()                                                                   #clicking pickup button
+
+    time.sleep(3)
+    try:
+        body = driver.find_element(By.XPATH, '/html/body')
+        body.send_keys(Keys.PAGE_DOWN)                                                  #for svrolling down page
+        body.send_keys(Keys.PAGE_DOWN)
+        time.sleep(3)
+
+        next_page = driver.find_element(By.XPATH,'/html/body/div/div/div[2]/div[3]/div/button[6]')
+        next_page.click()
+        next_page.click()
+
+        time.sleep(1)
+        see_all_1 = driver.find_element(By.XPATH,'/html/body/div/div/div[2]/div[2]/div/button')                #for seeing all resturants
+        see_all_1.click()
+    except:
+        pass
+
+    try:
+        see_all_2 = driver.find_element(By.XPATH, '/html/body/div/div/div[2]/div[2]/div/button')
+        see_all_2.click()
+    except:
+        pass
+
+
+    body = driver.find_element(By.XPATH, '/html/body')
+    body.send_keys(Keys.PAGE_DOWN)                                                  #for svrolling down page
+    body.send_keys(Keys.PAGE_DOWN)  # for svrolling down page
+    try:
+        time.sleep(1)
+        next_page = driver.find_element(By.XPATH,'/html/body/div/div/div[2]/div[3]/div/button[5]')                #xpath for moving to next page
+        next_page.click()
+        see_all= driver.find_element(By.CLASS_NAME,'css-1ia2kr8')                                                 #for seeing all resturants
+        see_all.click()
+        time.sleep(2)
+    except:
+        pass
+
+    list_1 = []                                                                                                   #list for adding links of all resturants
+    body = driver.find_element(By.XPATH, '/html/body')
+    body.send_keys(Keys.PAGE_DOWN)                                                  #for svrolling down page
+    time.sleep(3)
+
+    resturant = driver.find_elements(By.CSS_SELECTOR, 'a[class="css-812e39 enjnzfc0"]')                           #clicking on first resturant
+    body.send_keys(Keys.PAGE_DOWN)
+    time.sleep(3)
+    print(len(resturant))
+
+    for i in resturant:
+        print(i.get_attribute('href'))                                                                            #collecting all links
+        list_1.append(i.get_attribute('href'))                                                                    #adding links to links
+
+
+    print("-------------------")
+
+    from selenium import webdriver                                                                                #importing webdrivers
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.keys import Keys
+    from selenium.webdriver.remote import switch_to
+
+    s1 = Service('C:/chromedriver.exe')
+    chrome_options1 = webdriver.ChromeOptions()
+
+    prefs1 = {"profile.default_content_setting_values.notifications" : 2}                  # -->>>>? handle alert
+    chrome_options1.add_experimental_option("prefs", prefs1)
+
+    driver1 = webdriver.Chrome(chrome_options=chrome_options1,  service= s1)
+    driver1.implicitly_wait(5)
+    driver1.maximize_window()
+
+    products_list=[]                                                                                              #list of all data
+
+    for res in list_1:
+        driver1.get(res)
+        time.sleep(3)
+
+        try:
+            continue_btn = driver1.find_element(By.CSS_SELECTOR, 'button[data-test="order-method-submit"]')
+            continue_btn.click()
+
+        except:
+            pass
+
+        rest2 = driver1.find_element(By.CSS_SELECTOR, 'h3[data-test="venue-more-info"]')
+        rest2.click()
+
+        name = driver1.find_element(By.CSS_SELECTOR, 'h3[class="e1154tq85 css-t17w9r"]')                               #extrcting all data
+        print(name.text)
+        adress=driver1.find_element(By.CSS_SELECTOR, 'p[class="e1154tq80 css-dqz27h"]')
+        print("adress:",adress.text)
+        phone_number=driver1.find_element(By.CSS_SELECTOR, 'a[class="css-1s3ajo5 e1154tq84"]')
+        print("phone number:",phone_number.text)
+
+        list_1=[]
+        try:
+            open_hours1=driver1.find_element(By.CLASS_NAME, 'css-1wvl9op')
+            print("open hours:",open_hours1.text)
+            list_1.append(open_hours1.text)
+        except:
+            pass
+
+
+        list_2 =[]
+        try:
+            open_hours2=driver1.find_element(By.XPATH, '/html/body/div/div/div/main/section[1]/div/section/div/div/div/div[3]/div[2]')
+            print(open_hours2.text)
+            list_2.append(open_hours2.text)
+        except:
+            pass
+
+        products_dict = {                                                                                        #dictionary for creating data frame
+            "Resturanrt Name ": name.text,
+            "Address ": adress.text,
+            "Phone NO ": phone_number.text,
+            "link " : res,
+            "open Hour1 ": list_1,
+            "open Hour2 ": list_2
+
+            }
+        print(products_dict)
+        products_list.append(products_dict)                                                                    #adding dictionary into list
+        # print(products_list)
+        df = pd.DataFrame(products_list)                                                                       #creaating data frame (row columns)
+        print(df)
+        df.to_csv('Vancouver.csv')                                                                   #creating csv file
+
+
+
+else:
+    print("-------------")
+    delivery = driver.find_element(By.CSS_SELECTOR, 'button[data-test="submit-delivery"]')
+    delivery.click()
+
+    time.sleep(3)
+    try:
+        next_page = driver.find_element(By.XPATH,'/html/body/div/div/div[1]/div[3]/div/button[4]')
+        next_page.click()
+        time.sleep(2)
+        # body = driver.find_element(By.XPATH, '/html/body')
+        # body.send_keys(Keys.PAGE_DOWN)
+        #
+        # see_all= driver.find_element(By.CLASS_NAME,'css-1ia2kr8')
+        # see_all.click()
+        # time.sleep(2)
+    except:
+        pass
+
+
+    list_3 = []
+    body = driver.find_element(By.XPATH, '/html/body')
+    body.send_keys(Keys.PAGE_DOWN)
+    try:
+        time.sleep(3)
+        see_all = driver.find_element(By.CLASS_NAME, 'css-1ia2kr8')
+        see_all.click()
+    except:
+        pass
+    body.send_keys(Keys.PAGE_DOWN)
+    see_all = driver.find_element(By.CLASS_NAME, 'css-1ia2kr8')
+    try:
+        see_all.click()
+    except:
+        pass
+    time.sleep(3)
+    resturant = driver.find_elements(By.CSS_SELECTOR, 'a[class="css-812e39 enjnzfc0"]')
+    print(len(resturant))
+
+    products_list =[]
+    for i in resturant:
+        print(i.get_attribute('href'))
+        # list_3.append(i.get_attribute('href'))
+
+
+        name = i.find_element(By.CSS_SELECTOR, 'p[class="enjnzfc1 css-1l9imwu"]')
+        print(name.text)
+        location = i.find_element(By.CLASS_NAME, 'css-svrnpw')
+        print(location.text)
+        distance = i.find_element(By.CLASS_NAME, 'css-1ym9g4')
+        print(distance.text)
+
+        products_dict = {
+            "Resturanrt Name": name.text,
+            "Delivery range": distance.text,
+            "location": location.text,
+            "link": i.get_attribute('href')
+
+        }
+
+        print(products_dict)
+        products_list.append(products_dict)
+    # print(products_list)
+        df = pd.DataFrame(products_list)
+        print(df)
+        df.to_csv('Vancouver2.csv')
+
+
+# print(//////////////////////////////////////////////////  Hope Giving me Good Reviews   //////////////////////////////////////////////////////////////////)
+
+
